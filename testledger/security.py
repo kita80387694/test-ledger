@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from uuid import UUID
 
@@ -19,6 +20,21 @@ Database = Annotated[Session, Depends(get_db)]
 
 def unauthorized(message: str = "A valid bearer token is required.") -> LedgerError:
     return LedgerError(401, "unauthorized", message, {"WWW-Authenticate": "Bearer"})
+
+
+def issue_token(user_id: UUID) -> str:
+    settings = get_auth_settings()
+    now = datetime.now(timezone.utc)
+    return jwt.encode(
+        {
+            "sub": str(user_id),
+            "iat": now,
+            "exp": now + timedelta(minutes=settings.token_ttl_minutes),
+            "iss": JWT_ISSUER,
+        },
+        settings.jwt_secret.get_secret_value(),
+        algorithm=JWT_ALGORITHM,
+    )
 
 
 def current_user(db: Database, token: Annotated[str | None, Depends(oauth2_scheme)]) -> User:

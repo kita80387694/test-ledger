@@ -35,9 +35,13 @@ services:
 
   api:
     build: .
-    env_file: .env
     environment:
       DATABASE_URL: postgresql+psycopg://ledger:${POSTGRES_PASSWORD}@db:5432/test_ledger
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      TOKEN_TTL_MINUTES: ${TOKEN_TTL_MINUTES:-60}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:?Set DEMO_ADMIN_PASSWORD in .env}
+      DEMO_TESTER_PASSWORD: ${DEMO_TESTER_PASSWORD:?Set DEMO_TESTER_PASSWORD in .env}
+      DEMO_VIEWER_PASSWORD: ${DEMO_VIEWER_PASSWORD:?Set DEMO_VIEWER_PASSWORD in .env}
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
