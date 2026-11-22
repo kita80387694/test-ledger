@@ -151,8 +151,10 @@ def test_status_conflict_and_admin_only_reopening(client, login):
     ("method", "path", "body", "field"),
     [
         ("POST", "/plans", {"name": "   "}, "body.name"),
+        ("POST", "/plans", {"name": "nul\x00byte"}, "body.name"),
         ("GET", "/plans/no-uuid/summary", None, "path.plan_id"),
         ("GET", f"/plans/{uuid4()}/open-defects?limit=101", None, "query.limit"),
+        ("GET", f"/plans/{uuid4()}/failed-executions?offset=9000000000", None, "query.offset"),
     ],
 )
 def test_validation_errors_use_shared_envelope(client, login, method, path, body, field):

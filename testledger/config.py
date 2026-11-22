@@ -1,12 +1,16 @@
 from functools import lru_cache
 from typing import Annotated
 
-from pydantic import Field, SecretStr
+from pydantic import AnyHttpUrl, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+DemoPassword = Annotated[SecretStr, Field(min_length=8, max_length=256)]
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", hide_input_in_errors=True
+    )
 
     database_url: str
 
@@ -21,15 +25,20 @@ class AuthSettings(BaseSettings):
 class DemoViewerSettings(BaseSettings):
     model_config = Settings.model_config
 
-    demo_viewer_password: Annotated[SecretStr, Field(min_length=8, max_length=256)]
+    demo_viewer_password: DemoPassword
 
 
-class DemoTesterSettings(DemoViewerSettings):
-    demo_tester_password: Annotated[SecretStr, Field(min_length=8, max_length=256)]
+class DemoHTTPSettings(DemoViewerSettings):
+    demo_base_url: AnyHttpUrl = AnyHttpUrl("http://127.0.0.1:8000")
 
 
-class DemoSeedSettings(DemoTesterSettings):
-    demo_admin_password: Annotated[SecretStr, Field(min_length=8, max_length=256)]
+class DemoSettings(DemoHTTPSettings):
+    demo_tester_password: DemoPassword
+
+
+class DemoSeedSettings(DemoViewerSettings):
+    demo_tester_password: DemoPassword
+    demo_admin_password: DemoPassword
 
 
 @lru_cache

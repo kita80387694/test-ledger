@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from sqlalchemy.exc import OperationalError
 from starlette.exceptions import HTTPException
 
 
@@ -51,6 +52,14 @@ def register_error_handlers(app: FastAPI) -> None:
             for issue in exc.errors()
         ]
         return error_response(422, "validation_error", "Request validation failed.", details)
+
+    @app.exception_handler(OperationalError)
+    async def database_unavailable(_request: Request, _exc: OperationalError):
+        return error_response(503, "database_unavailable", "Database is unavailable.")
+
+    @app.exception_handler(Exception)
+    async def internal_error(_request: Request, _exc: Exception):
+        return error_response(500, "internal_error", "Unexpected server error.")
 
 
 def documented_errors(*statuses: int) -> dict[int | str, dict[str, Any]]:

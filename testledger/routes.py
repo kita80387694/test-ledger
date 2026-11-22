@@ -12,7 +12,7 @@ from testledger.schemas import (
 from testledger.security import CurrentUser, Database, Writer
 
 router = APIRouter(responses=documented_errors(401, 422))
-Offset = Annotated[int, Query(ge=0)]
+Offset = Annotated[int, Query(ge=0, le=2_147_483_647)]
 Limit = Annotated[int, Query(ge=1, le=100)]
 
 

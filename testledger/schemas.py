@@ -2,13 +2,20 @@ from datetime import datetime
 from typing import Annotated, Generic, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, StringConstraints
+from pydantic import BaseModel, ConfigDict, StringConstraints, field_validator
 
 from testledger.models import DefectStatus, Result
 
 
 class Input(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    @field_validator("*")
+    @classmethod
+    def reject_nul_characters(cls, value):
+        if isinstance(value, str) and "\x00" in value:
+            raise ValueError("Text must not contain NUL characters.")
+        return value
 
 
 class PlanCreate(Input):

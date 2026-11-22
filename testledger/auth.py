@@ -29,7 +29,7 @@ class TokenResponse(BaseModel):
 def login(
     form: Annotated[OAuth2PasswordRequestFormStrict, Depends()], db: Database, response: Response
 ) -> TokenResponse:
-    if not (1 <= len(form.username) <= 64 and 1 <= len(form.password) <= 256):
+    if not (1 <= len(form.username) <= 64 and 1 <= len(form.password) <= 256) or "\x00" in form.username:
         raise unauthorized("Invalid username or password.")
 
     user = db.scalar(select(User).where(User.username == form.username))
