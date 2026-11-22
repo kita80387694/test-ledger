@@ -4,7 +4,7 @@ TestLedger 记录测试计划、用例执行结果和失败产生的缺陷。计
 
 ## 从克隆到运行
 
-准备 Python 3.12、Git、Docker 和 Docker Compose V2，启动 Docker 引擎。下列命令均在仓库根目录执行。私有仓库需要已获访问权限的 GitHub 账号。
+准备 Python 3.12、Git、Docker 和 Docker Compose V2，启动 Docker 引擎。克隆后在仓库根目录执行后续命令。
 
 ```sh
 git clone https://github.com/kita80387694/test-ledger.git
